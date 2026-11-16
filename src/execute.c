@@ -2,8 +2,9 @@
 #include <fcntl.h>
 
 // Runs a pipeline of ncmds commands (ncmds == 1 means a plain command).
-// Returns the exit status of the last command.
-int execute_pipeline(command_t cmds[], int ncmds) {
+// If background is set, the shell does not wait; the job is added to the job list.
+// Returns the exit status of the last command (0 for a background launch).
+int execute_pipeline(command_t cmds[], int ncmds, int background, const char* cmdtext) {
     pid_t pids[MAX_CMDS];
     int launched = 0;
     int prev_read = -1;      // read end of the previous pipe (-1 = none)
@@ -35,6 +36,10 @@ int execute_pipeline(command_t cmds[], int ncmds) {
                 dup2(fd[1], STDOUT_FILENO);
                 close(fd[0]);
                 close(fd[1]);
+            }
+            if (background && i == 0 && cmds[i].infile == NULL) {
+                int dn = open("/dev/null", O_RDONLY);   // don't steal the shell's input
+                if (dn != -1) { dup2(dn, STDIN_FILENO); close(dn); }
             }
             if (cmds[i].infile) {               // '<' overrides the pipe
                 int in = open(cmds[i].infile, O_RDONLY);
@@ -69,6 +74,14 @@ int execute_pipeline(command_t cmds[], int ncmds) {
     }
 
     if (prev_read != -1) close(prev_read);      // only if we stopped early
+
+    if (background) {                           // do not wait; remember the job
+        if (launched == ncmds) {
+            add_job(pids[launched - 1], cmdtext);
+            return 0;
+        }
+        return 1;
+    }
 
     int exit_code = 1;
     for (int i = 0; i < launched; i++) {

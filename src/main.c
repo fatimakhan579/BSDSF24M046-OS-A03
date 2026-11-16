@@ -4,9 +4,15 @@
 
 int main() {
     char* cmdline;
-    char** arglist;
 
-    while ((cmdline = readline(PROMPT)) != NULL) {
+    for (;;) {
+        reap_jobs();                       // collect finished background jobs first
+
+        cmdline = readline(PROMPT);
+        if (cmdline == NULL)               // Ctrl+D
+            break;
+
+        reap_jobs();                       // also reap jobs that ended while we waited
 
         // History re-execution: replace "!n" with the stored command
         if (cmdline[0] == '!') {
@@ -20,35 +26,16 @@ int main() {
             }
             free(cmdline);
             cmdline = strdup(old);
-            printf("%s\n", cmdline);   // show what is being run
+            printf("%s\n", cmdline);       // show what is being run
         }
 
         // Store non-blank commands in history
-        if (cmdline[strspn(cmdline, " \t")] != '\0')
-        {
-            add_to_history(cmdline);   // our own list (history, !n)
-            add_history(cmdline);      // readline's list (up/down arrows)
+        if (cmdline[strspn(cmdline, " \t")] != '\0') {
+            add_to_history(cmdline);       // our own list (history, !n)
+            add_history(cmdline);          // readline's list (up/down arrows)
         }
 
-        if ((arglist = tokenize(cmdline)) != NULL) {
-            command_t cmds[MAX_CMDS];
-            int ncmds;
-
-            if (parse_pipeline(arglist, cmds, &ncmds) == 0) {
-                int handled = 0;
-                // A plain built-in (no pipe, no redirection) runs inside the shell
-                if (ncmds == 1 && cmds[0].infile == NULL && cmds[0].outfile == NULL)
-                    handled = handle_builtin(cmds[0].argv);
-                if (!handled)
-                    execute_pipeline(cmds, ncmds);
-            }
-
-            // Free the memory allocated by tokenize()
-            for (int i = 0; arglist[i] != NULL; i++) {
-                free(arglist[i]);
-            }
-            free(arglist);
-        }
+        run_line(cmdline);
         free(cmdline);
     }
 
