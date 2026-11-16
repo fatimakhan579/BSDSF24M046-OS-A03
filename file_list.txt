@@ -1,0 +1,9 @@
+total 28
+drwxr-xr-x 2 Fatima Fatima 4096 Nov 17 01:00 bin
+-rw-r--r-- 1 Fatima Fatima    0 Nov 17 01:00 file_list.txt
+drwxr-xr-x 2 Fatima Fatima 4096 Nov 17 00:57 include
+-rw-r--r-- 1 Fatima Fatima   42 Nov 17 01:00 in.txt
+-rw-r--r-- 1 Fatima Fatima  358 Nov 17 00:45 Makefile
+drwxr-xr-x 2 Fatima Fatima 4096 Nov 17 01:00 obj
+-rw-r--r-- 1 Fatima Fatima   20 Nov 16 22:40 README.md
+drwxr-xr-x 2 Fatima Fatima 4096 Nov 17 00:59 src

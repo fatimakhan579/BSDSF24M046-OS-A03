@@ -1,0 +1,1 @@
+printf 'banana\napple\ncherry\n' > in.txt

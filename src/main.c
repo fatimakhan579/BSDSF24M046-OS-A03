@@ -24,14 +24,23 @@ int main() {
         }
 
         // Store non-blank commands in history
-        if (cmdline[strspn(cmdline, " \t")] != '\0') {
+        if (cmdline[strspn(cmdline, " \t")] != '\0')
+        {
             add_to_history(cmdline);   // our own list (history, !n)
             add_history(cmdline);      // readline's list (up/down arrows)
         }
 
         if ((arglist = tokenize(cmdline)) != NULL) {
-            if (handle_builtin(arglist) == 0) {
-                execute(arglist);
+            command_t cmds[MAX_CMDS];
+            int ncmds;
+
+            if (parse_pipeline(arglist, cmds, &ncmds) == 0) {
+                int handled = 0;
+                // A plain built-in (no pipe, no redirection) runs inside the shell
+                if (ncmds == 1 && cmds[0].infile == NULL && cmds[0].outfile == NULL)
+                    handled = handle_builtin(cmds[0].argv);
+                if (!handled)
+                    execute_pipeline(cmds, ncmds);
             }
 
             // Free the memory allocated by tokenize()
