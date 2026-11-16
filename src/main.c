@@ -1,10 +1,12 @@
 #include "shell.h"
+#include <readline/readline.h>
+#include <readline/history.h>
 
 int main() {
     char* cmdline;
     char** arglist;
 
-    while ((cmdline = read_cmd(PROMPT, stdin)) != NULL) {
+    while ((cmdline = readline(PROMPT)) != NULL) {
 
         // History re-execution: replace "!n" with the stored command
         if (cmdline[0] == '!') {
@@ -22,8 +24,10 @@ int main() {
         }
 
         // Store non-blank commands in history
-        if (cmdline[strspn(cmdline, " \t")] != '\0')
-            add_to_history(cmdline);
+        if (cmdline[strspn(cmdline, " \t")] != '\0') {
+            add_to_history(cmdline);   // our own list (history, !n)
+            add_history(cmdline);      // readline's list (up/down arrows)
+        }
 
         if ((arglist = tokenize(cmdline)) != NULL) {
             if (handle_builtin(arglist) == 0) {
