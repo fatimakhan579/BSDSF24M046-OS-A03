@@ -29,10 +29,17 @@ int handle_builtin(char** arglist) {
         printf("  cd <dir>    Change the current directory\n");
         printf("  help        Show this help message\n");
         printf("  jobs        Show background jobs (not yet implemented)\n");
-        return 1;
+        printf("  history     Show the last commands entered\n");
+printf("  !n          Re-run command number n from history\n");
+return 1;
     }
 
-    if (strcmp(arglist[0], "jobs") == 0) {
+    
+if (strcmp(arglist[0], "history") == 0) {
+    print_history();
+    return 1;
+}
+if (strcmp(arglist[0], "jobs") == 0) {
         printf("Job control not yet implemented.\n");
         return 1;
     }
