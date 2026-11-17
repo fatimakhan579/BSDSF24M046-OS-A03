@@ -35,7 +35,7 @@ int main() {
             add_history(cmdline);          // readline's list (up/down arrows)
         }
 
-        run_line(cmdline);
+        run_command(cmdline);
         free(cmdline);
     }
 

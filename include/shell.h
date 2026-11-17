@@ -23,13 +23,14 @@ typedef struct {
 } command_t;
 
 // Function prototypes
+// Function prototypes
 char** tokenize(char* cmdline);
 int parse_pipeline(char** tokens, command_t cmds[], int* ncmds);
 int run_line(char* cmdline);
+int run_command(char* cmdline);                      // <-- add this
 int execute_pipeline(command_t cmds[], int ncmds, int background, const char* cmdtext);
 int handle_builtin(char** arglist);
-
-// Background job functions (jobs.c)
+extern int builtin_status;   // exit status of the last built-in (0 = success)   <-- and this// Background job functions (jobs.c)
 void add_job(pid_t pid, const char* cmd);
 void reap_jobs(void);
 void print_jobs(void);

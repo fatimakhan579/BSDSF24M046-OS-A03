@@ -1,8 +1,12 @@
 #include "shell.h"
 
+int builtin_status = 0;
+
 int handle_builtin(char** arglist) {
     if (arglist == NULL || arglist[0] == NULL)
         return 0;
+
+    builtin_status = 0;
 
     if (strcmp(arglist[0], "exit") == 0) {
         printf("Shell exited.\n");
@@ -15,11 +19,14 @@ int handle_builtin(char** arglist) {
             dir = getenv("HOME");
             if (dir == NULL) {
                 fprintf(stderr, "cd: HOME not set\n");
+                builtin_status = 1;
                 return 1;
             }
         }
-        if (chdir(dir) != 0)
+        if (chdir(dir) != 0) {
             perror("cd");
+            builtin_status = 1;
+        }
         return 1;
     }
 

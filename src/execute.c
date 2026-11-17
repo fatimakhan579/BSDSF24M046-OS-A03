@@ -55,7 +55,7 @@ int execute_pipeline(command_t cmds[], int ncmds, int background, const char* cm
             }
             if (handle_builtin(cmds[i].argv)) { // e.g. history | grep ls
                 fflush(stdout);
-                _exit(0);
+                _exit(builtin_status);;
             }
             execvp(cmds[i].argv[0], cmds[i].argv);
             perror(cmds[i].argv[0]);            // only reached if exec failed

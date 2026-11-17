@@ -21,7 +21,7 @@ static int run_statement(char** seg, int background) {
     // A plain built-in (no pipe, no redirection, not background) runs in the shell
     if (!background && ncmds == 1 && cmds[0].infile == NULL && cmds[0].outfile == NULL
         && handle_builtin(cmds[0].argv))
-        return 0;
+       return builtin_status;
 
     char text[MAX_LEN];
     join_tokens(seg, text, sizeof(text));
