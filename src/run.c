@@ -10,8 +10,8 @@ static void join_tokens(char** seg, char* buf, size_t size) {
     }
 }
 
-// Runs one pipeline (no ';' or '&' inside it).
-static int run_statement(char** seg, int background) {
+// Runs one pipeline whose variables have already been expanded.
+static int run_expanded(char** seg, int background) {
     command_t cmds[MAX_CMDS];
     int ncmds;
 
@@ -21,11 +21,40 @@ static int run_statement(char** seg, int background) {
     // A plain built-in (no pipe, no redirection, not background) runs in the shell
     if (!background && ncmds == 1 && cmds[0].infile == NULL && cmds[0].outfile == NULL
         && handle_builtin(cmds[0].argv))
-       return builtin_status;
+        return builtin_status;
 
     char text[MAX_LEN];
     join_tokens(seg, text, sizeof(text));
     return execute_pipeline(cmds, ncmds, background, text);
+}
+
+// Runs one statement (no ';' or '&' inside it): either variable assignments
+// such as NAME=value, or a command whose $VARIABLES are expanded first.
+static int run_statement(char** seg, int background) {
+    int all_assignments = 1;
+    for (int i = 0; seg[i] != NULL; i++) {
+        if (!is_assignment(seg[i]))
+            all_assignments = 0;
+    }
+
+    char* expanded[MAXARGS + 1];            // new strings, freed below
+    int n = 0;
+    for (; seg[n] != NULL; n++)
+        expanded[n] = expand_variables(seg[n]);
+    expanded[n] = NULL;
+
+    int status = 0;
+    if (all_assignments) {                  // handled by the shell itself, no fork
+        for (int i = 0; i < n; i++)
+            assign_variable(expanded[i]);
+    } else {
+        status = run_expanded(expanded, background);
+    }
+
+    for (int i = 0; i < n; i++)
+        free(expanded[i]);
+    set_last_status(status);                // remembered for $?
+    return status;
 }
 
 // Tokenizes a line, splits it at ';' and '&', and runs each part in order.

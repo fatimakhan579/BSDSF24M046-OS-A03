@@ -38,11 +38,16 @@ int handle_builtin(char** arglist) {
         printf("  history     Show the last commands entered\n");
         printf("  !n          Re-run command number n from history\n");
         printf("  jobs        List background jobs\n");
-        return 1;
+                printf("  set         Show all shell variables\n");
+return 1;
     }
 
     if (strcmp(arglist[0], "history") == 0) {
         print_history();
+        return 1;
+    }
+    if (strcmp(arglist[0], "set") == 0) {
+        print_vars();
         return 1;
     }
 

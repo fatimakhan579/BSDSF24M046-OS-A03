@@ -34,7 +34,12 @@ extern int builtin_status;   // exit status of the last built-in (0 = success)  
 void add_job(pid_t pid, const char* cmd);
 void reap_jobs(void);
 void print_jobs(void);
-
+// Shell variables (variables.c)
+int is_assignment(const char* token);
+void assign_variable(const char* token);
+char* expand_variables(const char* word);
+void set_last_status(int status);
+void print_vars(void);
 // History functions (history.c)
 void add_to_history(const char* cmdline);
 const char* get_history(int n);
