@@ -38,7 +38,17 @@ int handle_builtin(char** arglist) {
         printf("  history     Show the last commands entered\n");
         printf("  !n          Re-run command number n from history\n");
         printf("  jobs        List background jobs\n");
+
                 printf("  set         Show all shell variables\n");
+        printf("\nShell syntax:\n");
+        printf("  cmd1 ; cmd2        Run commands one after another\n");
+        printf("  cmd &              Run a command in the background\n");
+        printf("  cmd1 | cmd2        Pipe the output of cmd1 into cmd2\n");
+        printf("  cmd > file         Redirect output to a file\n");
+        printf("  cmd < file         Read input from a file\n");
+        printf("  NAME=value         Set a variable; use it as $NAME or ${NAME}\n");
+        printf("  if cmd / then / else / fi   Conditional (each keyword on its own line)\n");
+
 return 1;
     }
 
